@@ -94,8 +94,8 @@ scaled_dist_clust <-  function(.data,
   ncol_sm <- seq_len(ncol(sm_list))[-ncol(sm_list)]
   nrow_sm <- seq_len(nrow(sm_list))
 
-  sm_quantiles <- map(nrow_sm, function(x){
-    map(ncol_sm, function(y){
+  sm_quantiles <- parallel::mclapply(nrow_sm, function(x){
+    parallel::mclapply(ncol_sm, function(y){
       cell <- sm_list[-1] %>%
         magrittr::extract(x, y) %>% unlist()
       quantile(cell, prob = quantile_prob_val)
@@ -115,9 +115,9 @@ scaled_dist_clust <-  function(.data,
   nrow_data <- nrow(sm_dist_data)
   ncol_data <-  ncol(sm_dist_data[-1])
 
-  dist_data <- map(seq_len(nrow_data), function(x){ # first data
-    map(seq_len(nrow_data), function(y){ # 2nd data
-      map(seq_len(ncol_data), function(z){ # number of combinations nx*nfacet
+  dist_data <- parallel::mclapply(seq_len(nrow_data), function(x){ # first data
+    parallel::mclapply(seq_len(nrow_data), function(y){ # 2nd data
+      parallel::mclapply(seq_len(ncol_data), function(z){ # number of combinations nx*nfacet
         JS(
           prob = quantile_prob_val,
           unlist(sm_dist_data[-1] %>% magrittr::extract(x, z)),
