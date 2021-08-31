@@ -109,7 +109,7 @@ data <- data %>%
                        function(y){
       cell <- sm_list[-1] %>%
         magrittr::extract(x, y) %>% unlist()
-      quantile(cell, prob = quantile_prob_val)
+      quantile(cell, prob = quantile_prob_val, na.rm= TRUE)
     })  %>% bind_rows(.id = "category_id")
   }) %>% bind_rows(.id = "customer_serial_id")
 
