@@ -7,7 +7,7 @@
 #' @param quantile_prob_val
 #'
 #' @return
-#' @export scaled_dist_gran
+#' @export scaled_dist_gran_iqr
 #'
 #' @examples
 #' library(gravitas)
@@ -60,6 +60,8 @@ scaled_dist_gran_iqr <-  function(.data,
              {{gran1}},
              {{gran2}})
   }
+
+
 
 
   # scale the response (raw - marginal median/marginal IQR)
@@ -126,23 +128,64 @@ data <- data %>%
   nrow_data <- nrow(sm_dist_data)
   ncol_data <-  ncol(sm_dist_data[-1])
 
-  dist_data <- parallel::mclapply(seq_len(nrow_data),
-                                  function(x){ # first data
-    parallel::mclapply(seq_len(nrow_data),
-                       function(y){ # 2nd data
-      parallel::mclapply(seq_len(ncol_data),
-                         function(z){ # number of combinations nx*nfacet
-        JS(
-          prob = quantile_prob_val,
-          unlist(sm_dist_data[-1] %>% magrittr::extract(x, z)),
-          unlist(sm_dist_data[-1] %>% magrittr::extract(y, z))
-        ) %>% as_tibble() %>% set_names("value")
-      })%>% bind_rows(.id = "category_id")
-    })%>% bind_rows(.id = "customer_serial_id")
-  }) %>% bind_rows(.id = "customer_serial_id1")
+  # dist_data <- map(seq_len(nrow_data),
+  #                                 function(x){ # first data
+  #                                   value = parallel::mclapply(seq_len(nrow_data),
+  #                      function(y){ # 2nd data
+  #                        value2 = map(seq_len(ncol_data),
+  #                        function(z){ # number of combinations nx*nfacet
+  #       value3 = JS(
+  #         prob = quantile_prob_val,
+  #         unlist(sm_dist_data[-1] %>% magrittr::extract(x, z)),
+  #         unlist(sm_dist_data[-1] %>% magrittr::extract(y, z))
+  #       ) %>% as_tibble() %>% set_names("value")
+  #     }) %>%  bind_rows(.id = "category_id")
+  #   })%>% bind_rows(.id = "customer_serial_id")
+  # }) %>% bind_rows(.id = "customer_serial_id1")
+
+
+  #tab <- expand.grid(x = 1:2, y = 1:3, z =1:4)
+
+
+  tab <- expand.grid(x = seq_len(nrow_data), y = seq_len(nrow_data), z =seq_len(ncol_data))
+
+# using pmap: works wohooo
+  # dist_data <- purrr::pmap(tab,
+  #                                   function(x, y, z){
+  #                                     value3 = JS(
+  #                                       prob = quantile_prob_val,
+  #                                       unlist(sm_dist_data[-1] %>% magrittr::extract(x, z)),
+  #                                       unlist(sm_dist_data[-1] %>% magrittr::extract(y, z)))
+  # }) %>%
+  #   unlist () %>%
+  #   as_tibble() %>%
+  #   bind_cols(tab) %>%
+  #   rename("customer_serial_id" = "x",
+  #          "customer_serial_id1" = "y",
+  #          "category_id" = "z")
+  #
+
+  # using parallel::mclapply
+  dist_data <- parallel::mclapply((1:nrow(tab)),
+                           function(k){
+                             value3 = JS(
+                               prob = quantile_prob_val,
+                               unlist(sm_dist_data[-1] %>% magrittr::extract(tab$x[k], tab$z[k])),
+                               unlist(sm_dist_data[-1] %>% magrittr::extract(tab$y[k], tab$z[k])))
+                           }) %>%
+    unlist () %>%
+    as_tibble() %>%
+    bind_cols(tab) %>%
+    rename("customer_serial_id" = "x",
+           "customer_serial_id1" = "y",
+           "category_id" = "z")
+
+
 
   dist_mat <- dist_data %>%
-    mutate(customer_serial_id = as.numeric(customer_serial_id), customer_serial_id1 = as.numeric(customer_serial_id1)) %>%
+    #mutate(customer_serial_id = as.numeric(customer_serial_id),
+           #customer_serial_id1 = as.numeric(customer_serial_id1),
+           #category_id = as.numeric(category_id)) %>%
     left_join(customer_ref) %>%
     rename("customer_from" = "customer_id") %>%
     left_join(customer_ref, by = c("customer_serial_id1" =  "customer_serial_id"))%>%
@@ -158,3 +201,4 @@ data <- data %>%
 
   dist_mat
   }
+
