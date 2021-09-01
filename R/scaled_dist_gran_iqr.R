@@ -61,9 +61,6 @@ scaled_dist_gran_iqr <-  function(.data,
              {{gran2}})
   }
 
-
-
-
   # scale the response (raw - marginal median/marginal IQR)
 
   data <- unite(sm_gran, category, -c(1, 2), sep = "-")
