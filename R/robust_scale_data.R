@@ -64,12 +64,12 @@ robust_scale_data = function(.data,
   data <- unite(sm_gran, category, -c(all_of(key), all_of(response), all_of(index)), sep = "-")
 
   sm_gran_quant <- data %>%
-    group_by(!!sym(key), category) %>%
+    group_by(!!sym(key)) %>%
     summarise(q2 = stats::median(!!sym(response), na.rm = TRUE),
               iqr = stats::IQR(!!sym(response), na.rm = TRUE),  .groups = 'drop')
 
   data %>%
-    left_join(sm_gran_quant, by = c(key, "category")) %>%
+    left_join(sm_gran_quant, by = c(key)) %>%
     dplyr::mutate(scaled_response = (!!sym(response) - q2)/iqr) %>%
     select(-q2, -iqr) %>%
     ungroup() %>%
