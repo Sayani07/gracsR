@@ -25,8 +25,11 @@
 #'   filter_in = "wknd_wday",
 #'   filter_out = c("hhour", "fortnight")
 #'   )
+#' harmonies1 <- harmonies %>% mutate(facet_variable = NA)
+#'
+#'  h = harmonies1 %>% select(-facet_levels) %>% distinct() %>% mutate(facet_levels = NA)
 
-#' v = suppressWarnings(dist_wpd(sm, harmony_tbl = harmonies))
+#' v = suppressWarnings(dist_wpd(sm, harmony_tbl = h))
 #' v
 
 dist_wpd <- function(.data,

@@ -1,13 +1,14 @@
 #' compute distances and groups from algorithm based on raw distributions
 #'
-#' @param .data
-#' @param gran1
-#' @param gran2
-#' @param response
 #' @param quantile_prob_val
 #'
+#' @param .data a tsibble
+#' @param gran1 one granularity e.g. hour_day, day_week, wknd_wday
+#' @param gran2 one granularity distinct from gran1
+#' @param response measured variable
+#' @param quantile_prob_val values of probability for which distances between quantiles would be computed
+#'
 #' @return
-#' @export dist_gran
 #'
 #' @examples
 #' library(gravitas)
@@ -20,7 +21,7 @@
 #' dist_gran(sm, "hour_day")
 #' dist_gran(sm, "month_year")
 #' sm %>% scale_gran(method = "robust") %>% dist_gran("hour_day")
-
+#' @export
 dist_gran <-  function(.data,
                               gran1 = NULL,
                               gran2 = NULL,

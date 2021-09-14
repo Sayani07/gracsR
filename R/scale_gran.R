@@ -1,13 +1,12 @@
 #' robust_scaling of data marginal on categories of different granularities
 #'
-#' @param .data
-#' @param gran1
-#' @param gran2
-#' @param response
-#' @param method
+#' @param .data a tsibble
+#' @param gran1 one granularity e.g. hour_day, day_week, wknd_wday
+#' @param gran2 one granularity distinct from gran1
+#' @param response measured variable
+#' @param method scaling method like "robust" (Robust sscaling), "nqt" (Normal-quantile transform)
 #'
 #' @return scale_gran
-#' @export
 #'
 #' @examples
 #' library(gravitas)
@@ -22,6 +21,7 @@
 #'scale_gran(sm, response, method = "nqt")
 
 #' #todo : can add NQT marginal on each category?
+#' @export
 scale_gran = function(.data,
                              response = NULL,
                              method = "none"){ #, c("none", robust", "nqt")
