@@ -21,7 +21,7 @@
 #' v2
 #' #todo : can add NQT marginal on each category?
 robust_scale_data = function(.data,
-                      gran1 = c, # can't be kept NULL
+                      gran1 = NULL, # can't be kept NULL
                       gran2 = NULL,
                       response = NULL,
                       method = "robust"){
@@ -74,6 +74,6 @@ robust_scale_data = function(.data,
     select(-q2, -iqr) %>%
     ungroup() %>%
     as_tsibble(index = index, key = key) %>%
-    select(all_of(key), all_of(index), category, all_of(response), scaled_response)
+    select(all_of(key), all_of(index), all_of(response), scaled_response)
 
 }
