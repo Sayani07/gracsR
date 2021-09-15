@@ -5,7 +5,6 @@
 #' @param method method in stats::hclust()
 #'
 #' @return
-#' @export clust_gran
 #'
 #' @examples
 #' library(gravitas)
@@ -21,7 +20,7 @@
 #' sm %>% scale_gran(method = "nqt") %>% dist_gran(gran1 = "hour_day")%>%
 #' clust_gran()
 #' dist_wpd(sm, harmony_tbl = h)) %>% clust_gran()
-
+#' @export clust_gran
 clust_gran <-  function(dist,
                         kopt = NULL,
                         method = "ward.D"){
@@ -38,9 +37,8 @@ clust_gran <-  function(dist,
                                 clustermethod = fpc::disthclustCBI,
                                 classification = "averagedist",
                                 krange = 2:nmaxclust)
-}
     kopt = koptimal$kopt
-
+}
 
     groups <- tibble(group = cutree(hc, k=kopt))
     groups

@@ -1,13 +1,11 @@
-#' Title
-#'
-#' @param .data
-#' @param harmony_tbl
-#' @param filter_comb
-#' @param nperm
-#' @param nsamp
-#'
-#' @return
-#' @export
+#' Title Compute distances based on wpd
+#' Computes distances between subjects based on wpd across different granularities
+#' @param .data a tsibble
+#' @param harmony_tbl a harmony table
+#' @param response measured variable
+#' @param nperm number of permutations for normalization
+
+#' @return  returns an object of class "dist"
 #'
 #' @examples
 #' library(gravitas)
@@ -21,22 +19,22 @@
 #' gran2 = NULL
 #'   harmonies <- sm %>%
 #'   harmony(
-#'   ugran = "month",
+#'   ugran = "year",
 #'   filter_in = "wknd_wday",
-#'   filter_out = c("hhour", "fortnight")
+#'   filter_out = c("hhour", "fortnight", "quarter", "semester")
 #'   )
 #' harmonies1 <- harmonies %>% mutate(facet_variable = NA)
 #'
-#'  h = harmonies1 %>% select(-facet_levels) %>% distinct() %>% mutate(facet_levels = NA)
+#'  h = harmonies1 %>% select(-facet_levels) %>% distinct() %>% mutate(facet_levels = NA) %>% filter(x_variable %in% c("month_year", "hour_day", "wknd_wday"))
 
-#' v = suppressWarnings(dist_wpd(sm, harmony_tbl = h))
+#' v = dist_wpd(sm, harmony_tbl = h)
 #' v
-
+#' @export
 dist_wpd <- function(.data,
                       harmony_tbl = NULL,
-                      filter_comb = NULL,
-                      nperm = 2,
-                      nsamp =  2){
+                      #filter_comb = NULL,
+                      response = NULL,
+                      nperm = 100){
 
   key =  tsibble::key(.data)
   key = key[1] %>% as.character()
@@ -76,11 +74,10 @@ dist_wpd <- function(.data,
       as_tsibble(index = reading_datetime)
 
 
-    k =  hakear::select_harmonies(data_id,
+    k =  hakear::wpd(data_id,
                                   harmony_tbl = harmonies,
                                   response = {{response}},
-                                  nperm = nperm,
-                                  nsamp = nsamp)
+                                  nperm = nperm) %>% arrange(-wpd)
 
   }, mc.cores = parallel::detectCores() - 1, mc.preschedule = FALSE, mc.set.seed = FALSE) %>% dplyr::bind_rows(.id = "customer_serial_id") %>%
     #dplyr::mutate(!!key := m) %>%

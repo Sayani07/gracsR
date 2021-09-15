@@ -2,18 +2,26 @@
 % Please edit documentation in R/dist_wpd.R
 \name{dist_wpd}
 \alias{dist_wpd}
-\title{Title}
+\title{Title Compute distances based on wpd
+Computes distances between subjects based on wpd across different granularities}
 \usage{
-dist_wpd(.data, harmony_tbl = NULL, filter_comb = NULL, nperm = 2, nsamp = 2)
+dist_wpd(.data, harmony_tbl = NULL, response = NULL, nperm = 100)
 }
 \arguments{
-\item{nsamp}{}
+\item{.data}{a tsibble}
+
+\item{harmony_tbl}{a harmony table}
+
+\item{response}{measured variable}
+
+\item{nperm}{number of permutations for normalization}
 }
 \value{
-
+returns an object of class "dist"
 }
 \description{
-Title
+Title Compute distances based on wpd
+Computes distances between subjects based on wpd across different granularities
 }
 \examples{
 library(gravitas)
@@ -27,13 +35,13 @@ gran1 = "hour_day"
 gran2 = NULL
   harmonies <- sm \%>\%
   harmony(
-  ugran = "month",
+  ugran = "year",
   filter_in = "wknd_wday",
-  filter_out = c("hhour", "fortnight")
+  filter_out = c("hhour", "fortnight", "quarter", "semester")
   )
 harmonies1 <- harmonies \%>\% mutate(facet_variable = NA)
 
- h = harmonies1 \%>\% select(-facet_levels) \%>\% distinct() \%>\% mutate(facet_levels = NA)
-v = suppressWarnings(dist_wpd(sm, harmony_tbl = h))
+ h = harmonies1 \%>\% select(-facet_levels) \%>\% distinct() \%>\% mutate(facet_levels = NA) \%>\% filter(x_variable \%in\% c("month_year", "hour_day", "wknd_wday"))
+v = dist_wpd(sm, harmony_tbl = h)
 v
 }
