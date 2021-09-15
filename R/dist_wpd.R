@@ -39,6 +39,7 @@ dist_wpd <- function(.data,
   key =  tsibble::key(.data)
   key = key[1] %>% as.character()
 
+  index =  tsibble::index(.data) %>% as.character()
 
   if(is.null(response)){
     response =  tsibble::measured_vars(.data)
@@ -71,7 +72,7 @@ dist_wpd <- function(.data,
   elec_select_harmony = parallel::mclapply(seq_len(length(elec_split)), function(x){
 
     data_id <-  elec_split %>% magrittr::extract2(x) %>%
-      as_tsibble(index = reading_datetime)
+      as_tsibble(index = index)
 
 
     k =  hakear::wpd(data_id,
