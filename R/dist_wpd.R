@@ -91,10 +91,11 @@ dist_wpd <- function(.data,
   mydist <- elec_select_harmony %>%
     mutate(comb = paste(facet_variable, x_variable, sep = "-")) %>%
     select(comb, customer_id, wpd) %>%
-    pivot_wider(names_from = comb, values_from = wpd)
+    pivot_wider(names_from = comb, values_from = wpd) %>%
+    dplyr::rename(key1 := !!key)
 
   mydist <- column_to_rownames(mydist,
-                     var = key) %>%
+                     var = "key1") %>%
     dist()
 
   mydist
