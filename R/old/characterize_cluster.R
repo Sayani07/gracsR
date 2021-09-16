@@ -101,7 +101,7 @@ characterize_cluster <- function(.data = NULL,
         select(-customer_id, -group) %>%
         magrittr::extract(y) %>%
         unlist()
-      quantile(cell, prob = quantile_prob_val)
+      quantile(cell, prob = quantile_prob_val, na.rm =TRUE)
     })  %>% bind_rows(.id = "categories_serial_id")
   }) %>% bind_rows(.id = "group_id") %>%
     mutate(group_id = as.integer(group_id),

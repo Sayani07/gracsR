@@ -85,7 +85,7 @@ sm_hod_quantiles_cat <- purrr::pmap(tab,
                                   function(x, y){
 
                                       sm_category_list[-1] %>%
-                                               magrittr::extract2(x, y) %>% unlist() %>% quantile(prob = quantile_prob_val)
+                                               magrittr::extract2(x, y) %>% unlist() %>% quantile(prob = quantile_prob_val, na.rm =TRUE)
 })  %>% bind_rows() %>% bind_cols(tab) %>%
   rename("customer_serial_id" = "x",
          "category_id" = "y")
