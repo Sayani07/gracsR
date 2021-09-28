@@ -40,7 +40,10 @@ clust_gran <-  function(dist,
     kopt = koptimal$kopt
 }
 
-    groups <- tibble(group = cutree(hc, k=kopt))
+    group = cutree(hc, k=kopt)
+    names(group)
+
+    groups <- tibble(id = names(group), group = group %>% as_tibble() %>% pull(value))
     groups
 }
 
