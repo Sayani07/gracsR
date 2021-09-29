@@ -39,6 +39,7 @@ dist_wpd <- function(.data,
                      # filter_comb = NULL,
                      response = NULL,
                      nperm = 100) {
+
   key <- tsibble::key(.data)
   key <- key[1] %>% as.character()
 

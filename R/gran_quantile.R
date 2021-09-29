@@ -24,8 +24,9 @@
 #' sm %>% quantile_gran(gran1 = "hour_day")
 #' group = tibble(customer_id = c("10006704", "10017936", "10006414", "10018250"), group = c(1,2,1,1))
 #' sm_group <- sm %>% left_join(group)
-#'quantile_gran(.data, gran1, group = "group") # obtain quantiles for group
-#'quantile_gran(.data, gran1, group = NULL) # obtain quantiles for customer
+#' .data <- sm
+#'quantile_gran(sm_group, gran1, group = "group") # obtain quantiles for group
+#'quantile_gran(sm, gran1, group = NULL) # obtain quantiles for customer
 #' @export
 quantile_gran <-  function(.data,
                            gran1 = NULL,
@@ -38,6 +39,10 @@ quantile_gran <-  function(.data,
   {
     key =  tsibble::key(.data)
     key = key[1] %>% as.character()
+  }
+  else
+  {
+    key = group
   }
 
   if(is.null(response)){
@@ -79,9 +84,9 @@ quantile_gran <-  function(.data,
 
   # Compute list across categories
   sm_list <- data %>%
-    select(key, category, response) %>%
+    select(all_of(key), category, all_of(response)) %>%
     pivot_wider(names_from = category,
-                values_from = response, values_fn = list)
+                values_from = all_of(response), values_fn = list)
 
   # customer reference
 
