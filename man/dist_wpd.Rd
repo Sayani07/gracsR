@@ -30,18 +30,23 @@ library(parallel)
 library(tsibble)
 library(rlang)
 sm <- smart_meter10 \%>\%
-filter(customer_id \%in\% c("10006704", "10017936","10006414", "10018250"))
-gran1 = "hour_day"
-gran2 = NULL
-  harmonies <- sm \%>\%
+  filter(customer_id \%in\% c("10006704", "10017936", "10006414", "10018250"))
+gran1 <- "hour_day"
+gran2 <- NULL
+harmonies <- sm \%>\%
   harmony(
-  ugran = "year",
-  filter_in = "wknd_wday",
-  filter_out = c("hhour", "fortnight", "quarter", "semester")
+    ugran = "year",
+    filter_in = "wknd_wday",
+    filter_out = c("hhour", "fortnight", "quarter", "semester")
   )
 harmonies1 <- harmonies \%>\% mutate(facet_variable = NA)
 
- h = harmonies1 \%>\% select(-facet_levels) \%>\% distinct() \%>\% mutate(facet_levels = NA) \%>\% filter(x_variable \%in\% c("month_year", "hour_day", "wknd_wday"))
-v = dist_wpd(sm, harmony_tbl = h)
+h <- harmonies1 \%>\%
+  select(-facet_levels) \%>\%
+  distinct() \%>\%
+  mutate(facet_levels = NA) \%>\%
+  filter(x_variable \%in\% c("month_year", "hour_day", "wknd_wday"))
+
+v <- dist_wpd(sm, harmony_tbl = h)
 v
 }

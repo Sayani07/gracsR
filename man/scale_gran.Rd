@@ -27,12 +27,13 @@ robust_scaling of data marginal on categories of different granularities
 library(gravitas)
 library(tidyverse)
 sm <- smart_meter10 \%>\%
-filter(customer_id \%in\% c("10006704", "10017936","10006414", "10018250"))
-gran1 = "hour_day"
-gran2 = NULL
-response = "general_supply_kwh"
+  filter(customer_id \%in\% c("10006704", "10017936", "10006414", "10018250"))
+gran1 <- "hour_day"
+gran2 <- NULL
+response <- "general_supply_kwh"
 scale_gran(sm, response, method = "none")
 scale_gran(sm, response, method = "robust")
 scale_gran(sm, response, method = "nqt")
-#todo : can add NQT marginal on each category?
+
+# todo : can add NQT marginal on each category?
 }

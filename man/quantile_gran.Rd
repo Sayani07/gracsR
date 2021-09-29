@@ -9,7 +9,8 @@ quantile_gran(
   gran1 = NULL,
   gran2 = NULL,
   response = NULL,
-  quantile_prob_val = seq(0.1, 0.9, 0.1)
+  quantile_prob_val = seq(0.1, 0.9, 0.1),
+  group = NULL
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ quantile_gran(
 \item{response}{measured variable}
 
 \item{quantile_prob_val}{values of probability for which distances between quantiles would be computed}
+
+\item{group}{NULL if quantiles to be obtained for the key variable and the column name of the group variable if quantiles to be obtained for the group.}
 }
 \value{
 
@@ -40,4 +43,8 @@ response = "general_supply_kwh"
 dist_gran(sm, "hour_day")
 dist_gran(sm, "month_year")
 sm \%>\% quantile_gran(gran1 = "hour_day")
+group = tibble(customer_id = c("10006704", "10017936", "10006414", "10018250"), group = c(1,2,1,1))
+sm_group <- sm \%>\% left_join(group)
+quantile_gran(.data, gran1, group = "group") # obtain quantiles for group
+quantile_gran(.data, gran1, group = NULL) # obtain quantiles for customer
 }
