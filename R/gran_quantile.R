@@ -39,6 +39,10 @@ quantile_gran <-  function(.data,
     key =  tsibble::key(.data)
     key = key[1] %>% as.character()
   }
+  else
+  {
+    key = group
+  }
 
   if(is.null(response)){
     response =  tsibble::measured_vars(.data)
@@ -79,9 +83,9 @@ quantile_gran <-  function(.data,
 
   # Compute list across categories
   sm_list <- data %>%
-    select(key, category, response) %>%
+    select(all_of(key), category, all_of(response)) %>%
     pivot_wider(names_from = category,
-                values_from = response, values_fn = list)
+                values_from = all_of(response), values_fn = list)
 
   # customer reference
 
