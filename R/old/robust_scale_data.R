@@ -13,50 +13,52 @@
 #' library(gravitas)
 #' library(tidyverse)
 #' sm <- smart_meter10 %>%
-#' filter(customer_id %in% c("10006704", "10017936","10006414", "10018250"))
-#' gran1 = "hour_day"
-#' gran2 = NULL
-#' response = "general_supply_kwh"
+#'   filter(customer_id %in% c("10006704", "10017936", "10006414", "10018250"))
+#' gran1 <- "hour_day"
+#' gran2 <- NULL
+#' response <- "general_supply_kwh"
 #' v2 <- suppressWarnings(robust_scale_data(sm, "hour_day"))
 #' v2
-#' #todo : can add NQT marginal on each category?
-robust_scale_data = function(.data,
-                      gran1 = NULL, # can't be kept NULL
-                      gran2 = NULL,
-                      response = NULL,
-                      method = "robust"){
+#' # todo : can add NQT marginal on each category?
+robust_scale_data <- function(.data,
+                              gran1 = NULL, # can't be kept NULL
+                              gran2 = NULL,
+                              response = NULL,
+                              method = "robust") {
+  key <- tsibble::key(.data)
+  key <- key[1] %>% as.character()
 
-  key =  tsibble::key(.data)
-  key = key[1] %>% as.character()
+  index <- tsibble::index(.data) %>% as.character()
 
-  index =  tsibble::index(.data) %>% as.character()
-
-  if(is.null(response)){
-    response =  tsibble::measured_vars(.data)
-    response = response[1]
+  if (is.null(response)) {
+    response <- tsibble::measured_vars(.data)
+    response <- response[1]
   }
 
   # create_gran data
 
-  if(is.null(gran2)){
+  if (is.null(gran2)) {
     sm_gran <- .data %>%
       create_gran(gran1) %>%
-      #as_tibble() %>%
-      select(all_of(key),
-             response,
-             {{gran1}})
-
+      # as_tibble() %>%
+      select(
+        all_of(key),
+        response,
+        {{ gran1 }}
+      )
   }
 
-  if(!is.null(gran2)){
+  if (!is.null(gran2)) {
     sm_gran <- .data %>%
       create_gran(gran1) %>%
       create_gran(gran2) %>%
-      #as_tibble() %>%
-      select(key,
-             response,
-             {{gran1}},
-             {{gran2}})
+      # as_tibble() %>%
+      select(
+        key,
+        response,
+        {{ gran1 }},
+        {{ gran2 }}
+      )
   }
 
   # scale the response (raw - marginal median/marginal IQR)
@@ -65,15 +67,16 @@ robust_scale_data = function(.data,
 
   sm_gran_quant <- data %>%
     group_by(!!sym(key)) %>%
-    summarise(q2 = stats::median(!!sym(response), na.rm = TRUE),
-              iqr = stats::IQR(!!sym(response), na.rm = TRUE),  .groups = 'drop')
+    summarise(
+      q2 = stats::median(!!sym(response), na.rm = TRUE),
+      iqr = stats::IQR(!!sym(response), na.rm = TRUE), .groups = "drop"
+    )
 
   data %>%
     left_join(sm_gran_quant, by = c(key)) %>%
-    dplyr::mutate(scaled_response = (!!sym(response) - q2)/iqr) %>%
+    dplyr::mutate(scaled_response = (!!sym(response) - q2) / iqr) %>%
     select(-q2, -iqr) %>%
     ungroup() %>%
     as_tsibble(index = index, key = key) %>%
     select(all_of(key), all_of(index), all_of(response), scaled_response)
-
 }

@@ -7,6 +7,7 @@
 #' @param gran2 one granularity distinct from gran1
 #' @param response measured variable
 #' @param quantile_prob_val values of probability for which distances between quantiles would be computed
+#' @param group NULL if quantiles to be obtained for the key variable and the column name of the group variable if quantiles to be obtained for the group.
 #'
 #' @return
 #'
@@ -21,16 +22,23 @@
 #' dist_gran(sm, "hour_day")
 #' dist_gran(sm, "month_year")
 #' sm %>% quantile_gran(gran1 = "hour_day")
+#' group = tibble(customer_id = c("10006704", "10017936", "10006414", "10018250"), group = c(1,2,1,1))
+#' sm_group <- sm %>% left_join(group)
+#'quantile_gran(.data, gran1, group = "group") # obtain quantiles for group
+#'quantile_gran(.data, gran1, group = NULL) # obtain quantiles for customer
 #' @export
 quantile_gran <-  function(.data,
-                       gran1 = NULL,
-                       gran2 = NULL,
-                       response = NULL,
-                       quantile_prob_val = seq(0.1, 0.9, 0.1)){
+                           gran1 = NULL,
+                           gran2 = NULL,
+                           response = NULL,
+                           quantile_prob_val = seq(0.1, 0.9, 0.1),
+                           group = NULL){
 
-  key =  tsibble::key(.data)
-  key = key[1] %>% as.character()
-
+  if(is.null(group))
+  {
+    key =  tsibble::key(.data)
+    key = key[1] %>% as.character()
+  }
 
   if(is.null(response)){
     response =  tsibble::measured_vars(.data)
@@ -43,9 +51,10 @@ quantile_gran <-  function(.data,
     sm_gran <- .data %>%
       create_gran(gran1) %>%
       as_tibble() %>%
-      select(key,
-             response,
-             {{gran1}})
+      select_if(names(.) %in% c( all_of(key),
+                                 response,
+                                 {{ gran1 }},
+                                 {{ gran2 }}))
 
   }
 
@@ -54,10 +63,10 @@ quantile_gran <-  function(.data,
       create_gran(gran1) %>%
       create_gran(gran2) %>%
       as_tibble() %>%
-      select(key,
-             response,
-             {{gran1}},
-             {{gran2}})
+      select_if(names(.) %in% c( all_of(key),
+                                 response,
+                                 {{ gran1 }},
+                                 {{ gran2 }}))
   }
 
   data <- unite(sm_gran, category, -c(1, 2), sep = "-")

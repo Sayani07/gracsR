@@ -15,7 +15,7 @@ JS <- function(prob, q, p) {
   ppmf <- pmf(x, prob, p)
   m <- 0.5 * (ppmf + qpmf)
   JS <- suppressWarnings(0.5 * (sum(stats::na.omit(ppmf * log(ppmf / m, base = 2))) +
-                                  sum(stats::na.omit(qpmf * log(qpmf / m, base = 2)))))
+    sum(stats::na.omit(qpmf * log(qpmf / m, base = 2)))))
   return(JS)
 }
 
@@ -26,4 +26,3 @@ pmf <- function(x, p, q) {
   qpmf <- c(0, diff(qcdf) / (x[2] - x[1]))
   return(qpmf / sum(qpmf))
 }
-

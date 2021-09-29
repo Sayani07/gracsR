@@ -1,7 +1,8 @@
 # to appease R CMD check
 # most of these are in R/app.R
 utils::globalVariables(
-  c(":=",
+  c(
+    ":=",
     "cust_iter_id",
     "everything",
     "index",
@@ -10,5 +11,6 @@ utils::globalVariables(
     "rename",
     "sim_data",
     "sim_id",
-     "value")
+    "value"
+  )
 )
