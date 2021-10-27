@@ -149,7 +149,8 @@ dist_gran_cat <- function(.data,
     mutate(category_id = as.integer(category_id)) %>%
     left_join(category_ref, by = "category_id") %>%
     select(customer_from, customer_to, category, value) %>%
-    rename("distance" = "value")
+    rename("distance" = "value") %>%
+    mutate(distance = distance/nrow(category_ref))
 
   dist_mat
 }
